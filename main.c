@@ -1,28 +1,106 @@
 #include <htc.h>
 __CONFIG(FOSC_INTOSCIO & WDTE_OFF & PWRTE_OFF & MCLRE_OFF & BOREN_OFF & LVP_OFF & CPD_OFF & CP_OFF);
 #define _XTAL_FREQ 4000000
-#define LEDnr1 RA0
-#define LEDnr2 RA1
-#define LEDnr3 RA2
-//           GFEDCBA
-//        0b01111111
-#define b 0b00000011
-#define d 0b00100001
-#define f 0b00001110
-#define h 0b00001011
-#define n 0b00101011
-#define o 0b00100011
-#define s 0b00010010
-#define t 0b00000111
-unsigned int i;
+
+#define LEDnr1 RB4
+#define LEDnr2 RB5
+#define LEDnr3 RB6
+#define LEDnr4 RB7
+
+#define Stb RA0
+#define On  RA1
+#define OnH RA7
+#define Ant RA6
+
+#define a RA2 
+#define b RA4 
+#define c RB1
+#define d RB2
+#define e RB3
+#define f RA3
+#define g RB0
+
 void reset_led(void){
    LEDnr1=1;
    LEDnr2=1;
    LEDnr3=1; 
-   PORTB=0b011111111;   
+   LEDnr4=1; 
+   a=1;
+   b=1;
+   c=1;
+   d=1;
+   e=1;
+   f=1;
+   g=1;         
 }
-void draw_symbols(char symbols[3]){
-    for (i = 0; i < 3; i++){
+
+void letter_A(void){
+    a=0;
+    b=0;
+    c=0;
+    e=0;
+    f=0;
+    g=0;
+}
+
+void letter_b(void){
+   c=0;
+   d=0;
+   e=0;
+   f=0;
+   g=0;  
+}
+
+void letter_H(void){
+    b=0;
+    c=0;
+    e=0;
+    f=0;
+    g=0;
+}
+
+void letter_n(void){
+    c=0;
+    e=0;
+    g=0;
+}
+
+void letter_O(void){
+    a=0;
+    b=0;
+    c=0;
+    d=0;
+    e=0;
+    f=0;
+}
+
+void letter_S(void){
+    a=0;
+    c=0;
+    d=0;
+    f=0;
+    g=0;
+}
+
+void letter_t(void){
+    e=0;
+    f=0;
+    g=0;
+}
+
+void letter_space(void){
+    a=1;
+    b=1;
+    c=1;
+    d=1;
+    e=1;
+    f=1;
+    g=1;
+}
+
+void draw_symbols(char symbols[4]){
+    unsigned int i;
+    for (i = 0; i < 4; i++){
         reset_led();
         switch (i){
             case 0:
@@ -34,31 +112,34 @@ void draw_symbols(char symbols[3]){
             case 2:
                 LEDnr3=0;
                 break;
+            case 3:
+                LEDnr4=0;
+                break;
         }
         switch (symbols[i]){
+            case 'A':
+               letter_A(); 
+               break;
             case 'b':
-               PORTB=b; 
+               letter_b(); 
                break;
-            case 'd':
-               PORTB=d;
-               break;
-            case 'f':
-               PORTB=f;
-               break;
-            case 'h':
-               PORTB=h;
+            case 'H':
+               letter_H();
                break;
             case 'n':
-               PORTB=n;
+               letter_n();
                break;
-            case 'o':
-               PORTB=o;
+            case 'O':
+               letter_O;
                break;
-            case 's':
-               PORTB=s;
+            case 'S':
+               letter_S();
                break;
             case 't':
-               PORTB=t;
+               letter_t();
+               break;
+            case ' ':
+               letter_space();
                break;
             default:
                 reset_led();
@@ -69,18 +150,36 @@ void draw_symbols(char symbols[3]){
 void main(void) {
     TMR1ON = 0; //disabling timer for RB6-RB7 to be able to go outputs
     CMCON = 0x07;
-    TRISA=0b11111000;
-    TRISB=0b00000000;
+    
+
+    TRISA0=1;
+    TRISA1=1;
+    TRISA2=0;
+    TRISA3=0;
+    TRISA4=0;
+    TRISA5=0;
+    TRISA6=1;
+    TRISA7=1;
+    
+    TRISB0=1;
+    TRISB1=1;
+    TRISB2=1;
+    TRISB3=1;
+    TRISB4=0;
+    TRISB5=0;
+    TRISB6=0;
+    TRISB7=0;
+
     __delay_ms(1);
     while (1){
-        if (!RA3)
-            draw_symbols("on");
-        if (!RA4)
-            draw_symbols("off");
-        if (!RA6)
-            draw_symbols("hdd"); 
-        if (!RA7)
-            draw_symbols("stb"); 
+        if (On)
+            draw_symbols("On");
+        if (Stb&&!On&&!OnH&&!Ant)
+            draw_symbols("Stb");
+        if (OnH)
+            draw_symbols("On H"); 
+        if (Ant)
+            draw_symbols("Ant"); 
     reset_led();
     }
     return;
