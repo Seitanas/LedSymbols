@@ -31,7 +31,7 @@ void reset_led(void){
    d=1;
    e=1;
    f=1;
-   g=1;         
+   g=1;    
 }
 
 void letter_A(void){
@@ -60,8 +60,12 @@ void letter_H(void){
 }
 
 void letter_n(void){
+    a=1;
+    b=1;
     c=0;
+    d=1;
     e=0;
+    f=1;
     g=0;
 }
 
@@ -83,6 +87,10 @@ void letter_S(void){
 }
 
 void letter_t(void){
+    a=1;
+    b=1;
+    c=1;
+    d=0;
     e=0;
     f=0;
     g=0;
@@ -130,7 +138,7 @@ void draw_symbols(char symbols[4]){
                letter_n();
                break;
             case 'O':
-               letter_O;
+               letter_O();
                break;
             case 'S':
                letter_S();
@@ -142,16 +150,16 @@ void draw_symbols(char symbols[4]){
                letter_space();
                break;
             default:
-                reset_led();
+               letter_space();
         }
         __delay_ms(1);        
-    }   
+    }  
+    reset_led();
 }
 void main(void) {
     TMR1ON = 0; //disabling timer for RB6-RB7 to be able to go outputs
     CMCON = 0x07;
     
-
     TRISA0=1;
     TRISA1=1;
     TRISA2=0;
@@ -161,26 +169,25 @@ void main(void) {
     TRISA6=1;
     TRISA7=1;
     
-    TRISB0=1;
-    TRISB1=1;
-    TRISB2=1;
-    TRISB3=1;
+    TRISB0=0;
+    TRISB1=0;
+    TRISB2=0;
+    TRISB3=0;
     TRISB4=0;
     TRISB5=0;
     TRISB6=0;
     TRISB7=0;
-
+    reset_led();
     __delay_ms(1);
     while (1){
         if (On)
-            draw_symbols("On");
-        if (Stb&&!On&&!OnH&&!Ant)
-            draw_symbols("Stb");
-        if (OnH)
+            draw_symbols("On  ");
+        else if (Stb&&!On&&!OnH&&!Ant)
+            draw_symbols("Stb ");
+        else if (OnH)
             draw_symbols("On H"); 
-        if (Ant)
-            draw_symbols("Ant"); 
-    reset_led();
+        else if (Ant)
+            draw_symbols("Ant ");
+        reset_led();
     }
-    return;
 }
